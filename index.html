@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NBA 球員猜猜看</title>
+  <style>
+    body { font-family: Arial, sans-serif; text-align: center; padding: 50px; }
+    .teams { margin-bottom: 20px; font-size: 1.2em; }
+    input { padding: 8px; font-size: 1em; }
+    button { padding: 8px 16px; font-size: 1em; margin-left: 8px; }
+    .result { margin-top: 20px; font-size: 1.2em; }
+  </style>
+</head>
+<body>
+  <h1>NBA 球員猜猜看</h1>
+  <div class="teams" id="teams"></div>
+  <div>
+    <input type="text" id="guessInput" placeholder="輸入球員姓名">
+    <button id="submitBtn">猜一猜</button>
+    <button id="nextBtn">下一題</button>
+  </div>
+  <div class="result" id="result"></div>
+
+  <script>
+    const players = [
+      { name: 'LeBron James', teams: ['克里夫蘭騎士', '邁阿密熱火', '洛杉磯湖人'] },
+      { name: 'Kobe Bryant', teams: ['夏洛特黄蜂', '洛杉磯湖人'] },
+      { name: 'Kevin Durant', teams: ['西雅圖超音速', '奧克拉荷馬雷霆', '金州勇士', '布魯克林籃網', '菲尼克斯太陽'] },
+      { name: 'James Harden', teams: ['奧克拉荷馬雷霆', '休斯頓火箭', '布魯克林籃網', '費城76人'] },
+      // 更多球員資料可在此添加
+    ];
+
+    let currentTeams = [];
+    let matchingPlayers = [];
+
+    function shuffle(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+    }
+
+    function arraysEqual(a, b) {
+      if (a.length !== b.length) return false;
+      const sortedA = [...a].sort();
+      const sortedB = [...b].sort();
+      return sortedA.every((val, index) => val === sortedB[index]);
+    }
+
+    function newGame() {
+      document.getElementById('result').textContent = '';
+      const randomIndex = Math.floor(Math.random() * players.length);
+      currentTeams = players[randomIndex].teams;
+      matchingPlayers = players.filter(p => arraysEqual(p.teams, currentPlayersTeams));
+      // 顯示球隊列表（亂序）
+      const displayTeams = [...currentTeams];
+      shuffle(displayTeams);
+      document.getElementById('teams').textContent = '這位球員曾效力於：' + displayTeams.join('、');
+      document.getElementById('guessInput').value = '';
+      document.getElementById('guessInput').focus();
+    }
+
+    document.getElementById('submitBtn').addEventListener('click', () => {
+      const guess = document.getElementById('guessInput').value.trim().toLowerCase();
+      if (!guess) return;
+      const isCorrect = matchingPlayers.some(p => p.name.toLowerCase() === guess);
+      const resultEl = document.getElementById('result');
+      if (isCorrect) {
+        resultEl.textContent = '恭喜你，猜對了！可能的正確答案有：' + matchingPlayers.map(p => p.name).join('、');
+      } else {
+        resultEl.textContent = '猜錯了，再試一次！';
+      }
+    });
+
+    document.getElementById('nextBtn').addEventListener('click', newGame);
+
+    // 啟動遊戲
+    newGame();
+  </script>
+</body>
+</html>
